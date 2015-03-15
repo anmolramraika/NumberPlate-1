@@ -22,7 +22,7 @@ function varargout = HPU_gui(varargin)
 
 % Edit the above text to modify the response to help HPU_gui
 
-% Last Modified by GUIDE v2.5 09-Mar-2015 00:24:17
+% Last Modified by GUIDE v2.5 15-Mar-2015 20:42:18
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -79,29 +79,64 @@ varargout{1} = handles.output;
 
 % --- Executes on button press in NextImage.
 function NextImage_Callback(hObject, eventdata, handles)
-axes(handles.axes1);
+cla reset
 old = cd('dataset');
 handles.I = imread(handles.f(handles.c,:),'jpg');
-imshow(handles.I);
+assignin('base','im',handles.I);
+im = handles.I;
+axes(handles.axes1);
+handles.I1 = crop_cpu(im);
+imshow(handles.I1);
+axes(handles.axes2);
+handles.I2 = crop_cpu_2(im);
+imshow(handles.I2);
 cd(old);
-handles.c = handles.c + 1;
+% handles.c = handles.c + 1;
 guidata(hObject,handles);
 
 
 % --- Executes on button press in PassImage.
 function PassImage_Callback(hObject, eventdata, handles)
 old = cd('crop_images');
-filename = strcat('crop_',handles.f(handles.c-1,:));
-imwrite(handles.I,filename,'jpg');
+filename = strcat('crop_',handles.f(handles.c,:));
+imwrite(handles.I1,filename,'jpg');
 cd(old);
+handles.c = handles.c + 1;
+axes(handles.axes1);
+cla reset
+axes(handles.axes2);
+cla reset
+guidata(hObject,handles);
 
 
 % --- Executes on button press in CropImage.
 function CropImage_Callback(hObject, eventdata, handles)
-handles.I = imcrop(handles.I);
-old = cd('crop_images');
-filename = strcat('crop_',handles.f(handles.c-1,:));
-imwrite(handles.I,filename,'jpg');
-cd(old);
+axes(handles.axes1);
+cla reset
+axes(handles.axes2);
+cla reset
 axes(handles.axes1);
 imshow(handles.I);
+handles.crop = imcrop(handles.I);
+old = cd('crop_images');
+filename = strcat('crop_',handles.f(handles.c,:));
+imwrite(handles.crop,filename,'jpg');
+cd(old);
+axes(handles.axes2);
+imshow(handles.crop);
+handles.c = handles.c + 1;
+guidata(hObject,handles);
+
+
+% --- Executes on button press in PassImage2.
+function PassImage2_Callback(hObject, eventdata, handles)
+old = cd('crop_images');
+filename = strcat('crop_',handles.f(handles.c,:));
+imwrite(handles.I2,filename,'jpg');
+cd(old);
+handles.c = handles.c + 1;
+axes(handles.axes1);
+cla reset
+axes(handles.axes2);
+cla reset
+guidata(hObject,handles);
